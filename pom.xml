@@ -43,7 +43,7 @@
     <projectOwner>Red Hat, Inc.</projectOwner>
     <javaVersion>1.8</javaVersion>
     <httpcoreVersion>4.4.6</httpcoreVersion>
-    <httpclientVersion>4.5.3</httpclientVersion>
+    <httpclientVersion>4.5.13</httpclientVersion>
     <dockerWaitFor>Setting LogLevel for all modules to trace6</dockerWaitFor>
 
     <dockerImage>docker.io/commonjava/ssl-dojo:1.1</dockerImage>
