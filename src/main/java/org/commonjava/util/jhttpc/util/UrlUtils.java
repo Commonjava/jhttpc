@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015-2024 Red Hat, Inc. (https://github.com/Commonjava/jhttpc)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,25 +53,28 @@ public final class UrlUtils
             urlBuilder.append( baseUrl );
         }
 
-        for ( String part : parts )
+        if ( parts != null )
         {
-            if ( part == null || part.trim()
-                                     .length() < 1 )
+            for ( String part : parts )
             {
-                continue;
-            }
+                if ( part == null || part.trim()
+                                         .length() < 1 )
+                {
+                    continue;
+                }
 
-            if ( part.startsWith( "/" ) )
-            {
-                part = part.substring( 1 );
-            }
+                if ( part.startsWith( "/" ) )
+                {
+                    part = part.substring( 1 );
+                }
 
-            if ( urlBuilder.length() > 0 && urlBuilder.charAt( urlBuilder.length() - 1 ) != '/' )
-            {
-                urlBuilder.append( "/" );
-            }
+                if ( urlBuilder.length() > 0 && urlBuilder.charAt( urlBuilder.length() - 1 ) != '/' )
+                {
+                    urlBuilder.append( "/" );
+                }
 
-            urlBuilder.append( part );
+                urlBuilder.append( part );
+            }
         }
 
         if ( params != null && !params.isEmpty() )
