@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015-2024 Red Hat, Inc. (https://github.com/Commonjava/jhttpc)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,11 +45,13 @@ public class ConnectionManagerCache
     private static final long EXPIRATION_MILLIS = TimeUnit.MILLISECONDS.convert( EXPIRATION_SECONDS, TimeUnit.SECONDS );
 
     private final Map<SiteConnectionConfig, ConnectionManagerTracker> cache =
-            new HashMap<SiteConnectionConfig, ConnectionManagerTracker>();
+            new HashMap<>();
 
     private final Timer timer = new Timer( "jhttpc-connection-manager-cache", true );
 
     private final Logger logger = LoggerFactory.getLogger( getClass() );
+
+    private boolean shutdown;
 
     public ConnectionManagerCache()
     {
@@ -60,7 +62,7 @@ public class ConnectionManagerCache
     {
         long expiration = System.currentTimeMillis() - TimeUnit.MILLISECONDS.convert( duration, unit );
 
-        for ( SiteConnectionConfig config : new HashSet<SiteConnectionConfig>( cache.keySet() ) )
+        for ( SiteConnectionConfig config : new HashSet<>( cache.keySet() ) )
         {
             ConnectionManagerTracker tracker = cache.get( config );
             if ( tracker != null && tracker.getLastRetrieval() < expiration )
@@ -80,13 +82,12 @@ public class ConnectionManagerCache
     public synchronized ConnectionManagerTracker getTrackerFor( SiteConnectionConfig config )
             throws JHttpCException
     {
-        ConnectionManagerTracker tracker = cache.get( config );
-        if ( tracker == null )
+        if ( shutdown )
         {
-            tracker = new ConnectionManagerTracker( config, this );
-            cache.put( config, tracker );
+            throw new JHttpCException( "Connection manager cache already shut down for: %s", null, config );
         }
 
+        ConnectionManagerTracker tracker = cache.computeIfAbsent( config, c -> new ConnectionManagerTracker( c, this ) );
         return tracker.retrieved();
     }
 
@@ -147,6 +148,8 @@ public class ConnectionManagerCache
         }
 
         timer.cancel();
+        shutdown = true;
+        cache.clear();
 
         return result;
     }
@@ -186,7 +189,7 @@ public class ConnectionManagerCache
             extends TimerTask
     {
 
-        private ConnectionManagerCache cache;
+        private final ConnectionManagerCache cache;
 
         public ExpirationSweeper( ConnectionManagerCache cache )
         {

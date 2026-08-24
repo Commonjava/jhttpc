@@ -104,12 +104,21 @@ public class ConnectionManagerTracker
     {
         if ( detached && !isActive() )
         {
-            manager.reallyShutdown();
+            closeManager();
             managerCache.remove( config );
             return true;
         }
 
         return false;
+    }
+
+    private void closeManager()
+    {
+        if ( manager != null )
+        {
+            manager.reallyShutdown();
+            manager = null;
+        }
     }
 
     public long getLastRetrieval()
@@ -180,7 +189,7 @@ public class ConnectionManagerTracker
     @Override
     public synchronized boolean shutdownNow()
     {
-        manager.reallyShutdown();
+        closeManager();
         return true;
     }
 
@@ -196,7 +205,7 @@ public class ConnectionManagerTracker
 
         if ( !isActive() )
         {
-            manager.reallyShutdown();
+            closeManager();
             return true;
         }
 
