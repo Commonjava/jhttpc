@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015-2024 Red Hat, Inc. (https://github.com/Commonjava/jhttpc)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -91,14 +91,9 @@ public class ConnectionManagerCache
     }
 
     @Override
-    public boolean isShutdown()
+    public synchronized boolean isShutdown()
     {
-        if ( !cache.isEmpty() )
-        {
-            return cache.values().stream().filter( tracker -> tracker.isActive() ).findAny().isPresent();
-        }
-
-        return true;
+        return cache.values().stream().noneMatch( ConnectionManagerTracker::isActive );
     }
 
     @Override
