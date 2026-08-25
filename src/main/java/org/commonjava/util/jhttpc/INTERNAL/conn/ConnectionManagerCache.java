@@ -92,14 +92,9 @@ public class ConnectionManagerCache
     }
 
     @Override
-    public boolean isShutdown()
+    public synchronized boolean isShutdown()
     {
-        if ( !cache.isEmpty() )
-        {
-            return cache.values().stream().filter( tracker -> tracker.isActive() ).findAny().isPresent();
-        }
-
-        return true;
+        return cache.values().stream().noneMatch( ConnectionManagerTracker::isActive );
     }
 
     @Override
