@@ -69,7 +69,7 @@
     <intersigned-http-port>${intersigned-http}</intersigned-http-port>
     <intersigned-https-port>${intersigned-https}</intersigned-https-port>
 
-    <f8-docker-version>0.15.16</f8-docker-version>
+    <f8-docker-version>0.49.0</f8-docker-version>
 
     <plugin.jacoco.skip>false</plugin.jacoco.skip>
   </properties>
