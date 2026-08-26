@@ -106,6 +106,7 @@ public class ConnectionManagerCache
         }
         catch ( InterruptedException e )
         {
+            Thread.currentThread().interrupt();
             logger.warn( "Interrupted while shutting down connection manager cache." );
         }
 
@@ -125,36 +126,39 @@ public class ConnectionManagerCache
             return t;
         } );
 
-        ExecutorCompletionService<Boolean> svc = new ExecutorCompletionService<>( exec );
-
-        int submitted = 0;
-        for ( ConnectionManagerTracker tracker : cache.values() )
+        try
         {
-            svc.submit( () -> shutdownAction.apply( tracker ) );
-            submitted++;
-        }
+            ExecutorCompletionService<Boolean> svc = new ExecutorCompletionService<>( exec );
 
-        boolean result = true;
-        for ( int i = 0; i < submitted; i++ )
+            int submitted = 0;
+            for ( ConnectionManagerTracker tracker : cache.values() )
+            {
+                svc.submit( () -> shutdownAction.apply( tracker ) );
+                submitted++;
+            }
+
+            boolean result = true;
+            for ( int i = 0; i < submitted; i++ )
+            {
+                try
+                {
+                    boolean shutDown = svc.take().get();
+                    result = result && shutDown;
+                }
+                catch ( ExecutionException e )
+                {
+                    logger.warn( "Error executing shutdown of connection managers.", e );
+                    result = false;
+                }
+            }
+
+            return result;
+        }
+        finally
         {
-            try
-            {
-                boolean shutDown = svc.take().get();
-                result = result && shutDown;
-            }
-            catch ( ExecutionException e )
-            {
-                logger.warn( "Error executing shutdown of connection managers.", e );
-                result = false;
-            }
+            exec.shutdown();
+            timer.cancel();
         }
-
-        exec.shutdown();
-        timer.cancel();
-        shutdown = true;
-        cache.clear();
-
-        return result;
     }
 
     @Override
