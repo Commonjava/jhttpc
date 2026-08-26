@@ -413,7 +413,7 @@ public class HttpFactory
             logger.debug( "Setting up SSL context." );
             try
             {
-                SSLContextBuilder sslBuilder = SSLContexts.custom().useProtocol( SSLConnectionSocketFactory.TLS );
+                SSLContextBuilder sslBuilder = SSLContexts.custom().setProtocol( SSLConnectionSocketFactory.TLS );
 
                 if ( ks != null )
                 {
