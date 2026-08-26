@@ -129,14 +129,8 @@ public class ConnectionManagerCache
         try
         {
             ExecutorCompletionService<Boolean> svc = new ExecutorCompletionService<>( exec );
-
-            int submitted = 0;
-            for ( ConnectionManagerTracker tracker : cache.values() )
-            {
-                svc.submit( () -> shutdownAction.apply( tracker ) );
-                submitted++;
-            }
-
+            int submitted = cache.size();
+            cache.values().forEach( tracker -> svc.submit( () -> shutdownAction.apply( tracker ) ) );
             boolean result = true;
             for ( int i = 0; i < submitted; i++ )
             {
