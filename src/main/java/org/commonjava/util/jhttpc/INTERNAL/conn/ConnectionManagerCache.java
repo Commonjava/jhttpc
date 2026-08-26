@@ -106,6 +106,7 @@ public class ConnectionManagerCache
         }
         catch ( InterruptedException e )
         {
+            Thread.currentThread().interrupt();
             logger.warn( "Interrupted while shutting down connection manager cache." );
         }
 
@@ -125,28 +126,33 @@ public class ConnectionManagerCache
             return t;
         } );
 
-        ExecutorCompletionService<Boolean> svc = new ExecutorCompletionService<>( exec );
-        cache.forEach( ( config, tracker ) -> svc.submit( () -> shutdownAction.apply( tracker ) ) );
-
-        boolean result = true;
-        while ( counter.getAndDecrement() > 0 )
+        try
         {
-            try
+            ExecutorCompletionService<Boolean> svc = new ExecutorCompletionService<>( exec );
+            int submitted = cache.size();
+            cache.values().forEach( tracker -> svc.submit( () -> shutdownAction.apply( tracker ) ) );
+            boolean result = true;
+            for ( int i = 0; i < submitted; i++ )
             {
-                result = result && svc.take().get();
+                try
+                {
+                    boolean shutDown = svc.take().get();
+                    result = result && shutDown;
+                }
+                catch ( ExecutionException e )
+                {
+                    logger.warn( "Error executing shutdown of connection managers.", e );
+                    result = false;
+                }
             }
-            catch ( ExecutionException e )
-            {
-                logger.warn( "Error executing shutdown of connection managers." );
-                result = false;
-            }
+
+            return result;
         }
-
-        timer.cancel();
-        shutdown = true;
-        cache.clear();
-
-        return result;
+        finally
+        {
+            exec.shutdown();
+            timer.cancel();
+        }
     }
 
     @Override
