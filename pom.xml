@@ -43,6 +43,7 @@
     <projectOwner>Red Hat, Inc.</projectOwner>
     <projectEmail>https://github.com/Commonjava/jhttpc</projectEmail>
     <javaVersion>11</javaVersion>
+    <maven.compiler.release>${javaVersion}</maven.compiler.release>
     <!-- Match versions from web-commons-bom -->
     <httpcoreVersion>4.4.16</httpcoreVersion>
     <httpclientVersion>4.5.14</httpclientVersion>
