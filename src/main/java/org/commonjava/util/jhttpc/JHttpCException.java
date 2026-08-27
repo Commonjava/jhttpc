@@ -26,6 +26,7 @@ public class JHttpCException
 {
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings( "serial" )
     private Object[] params;
 
     private transient String formatted;
