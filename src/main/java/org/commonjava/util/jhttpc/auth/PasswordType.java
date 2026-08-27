@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2015-2024 Red Hat, Inc. (https://github.com/Commonjava/jhttpc)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
