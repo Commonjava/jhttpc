@@ -224,16 +224,23 @@ public class HttpFactory
             }
 
 
-            CookieStore cookieStore = (CookieStore) location.getAttribute( COOKIE_STORE );
-            if ( cookieStore == null )
+            if ( ctx.getCookieStore() == null )
             {
-                logger.debug( "Creating CookieStore" );
-                cookieStore = new BasicCookieStore();
-                location.setAttribute( COOKIE_STORE, cookieStore );
-            }
+                CookieStore cookieStore = (CookieStore) location.getAttribute( COOKIE_STORE );
+                if ( cookieStore == null )
+                {
+                    logger.debug( "Creating CookieStore" );
+                    cookieStore = new BasicCookieStore();
+                    location.setAttribute( COOKIE_STORE, cookieStore );
+                }
 
-            logger.debug( "Setting CookieStore" );
-            ctx.setCookieStore( cookieStore );
+                logger.debug( "Setting CookieStore" );
+                ctx.setCookieStore( cookieStore );
+            }
+            else
+            {
+                logger.debug( "Keeping the supplied CookieStore" );
+            }
 
             final AuthScope as;
             try
