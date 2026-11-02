@@ -339,7 +339,7 @@ javax.net.debug=ssl:handshake:verbose
         </plugin>
         <plugin>
           <artifactId>maven-failsafe-plugin</artifactId>
-          <version>3.6.0</version>
+          <version>3.6.1</version>
           <executions>
             <execution>
               <id>functional-tests</id>
